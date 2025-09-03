@@ -2,13 +2,6 @@ assets: [
   "EURUSD", "GBPUSD", "USDJPY", "AUDUSD", "USDCAD", "NZDUSD",
   "EURJPY", "GBPJPY", "USDCHF", "XAUUSD"
 ]
-# DXY feature only
----
-# ===== FX + XAUUSD universe (with DXY as feature) =====
-assets: [
-  "EURUSD", "GBPUSD", "USDJPY", "AUDUSD", "USDCAD", "NZDUSD",
-  "EURJPY", "GBPJPY", "USDCHF", "XAUUSD"
-]
 # DXY is used as a feature / regime overlay (not traded).
 dxy:
   symbol_aliases: ["DXY", "DX-Y.NYB", "DX1!", "ICEUS:DX"]
