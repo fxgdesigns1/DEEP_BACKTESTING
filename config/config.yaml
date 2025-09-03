@@ -1,0 +1,48 @@
+telegram:
+  token: "7248728383:AAEE7lkAAIUXBcK9iTPR5NIeTq3Aqbyx6IU"
+  chat_id: "6100678501"
+  
+notifications:
+  # Minimal notifications
+  trade_signals: false     # DISABLED - Only system status and manual requests
+  system_status: true      # Only offline status
+  performance_updates: false
+  error_alerts: false
+  
+  # Notification filters
+  notify_on:
+    frozen_signal: true    # Only when a signal is frozen (confirmed)
+    tp_hit: false         # No TP notifications
+    sl_hit: false         # No SL notifications
+    new_signal: false     # No notifications for new unfrozen signals
+    system_start: false   # No system start notifications
+    system_stop: true     # Only notify when system goes offline
+    system_error: false   # No error notifications
+    manual_report: true   # Allow manual trade report requests
+  
+  # Minimum time between similar notifications (seconds)
+  cooldown:
+    signals: 300          # 5 minutes between trade signals
+    status: 60           # 1 minute between status updates
+    errors: 60           # 1 minute between error alerts
+  
+  # Trading thresholds for notifications
+  min_rr_ratio: 1.5      # Minimum risk-reward ratio for trade signals
+  min_confidence: 70     # Minimum confidence score for trade signals
+
+# Environment-specific settings
+environment: "local"  # Change to "aws" when deploying
+aws:
+  region: "us-east-1"
+  instance_type: "t2.micro"
+  
+# API configuration
+api:
+  host: "0.0.0.0"  # Change if needed for AWS
+  port: 8000
+  
+# Logging configuration  
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: "trading_system.log"

@@ -1,0 +1,163 @@
+# Quant Strategy AI Configuration
+# Core trading parameters
+
+# Trading Parameters
+bias_mode: "system-detect"  # system-detect, bullish, bearish
+rr_min:
+  swing: 3.0
+  scalp: 1.8
+
+# Core Major Pairs (always analyzed)
+core_major_pairs:
+  - EUR_USD
+  - GBP_USD
+  - USD_JPY
+  - AUD_USD
+  - USD_CAD
+  - USD_CHF
+  - NZD_USD
+
+# Additional Watchlist
+watchlist:
+  - XAU_USD
+  - NDX_USD
+  - BTC_USD
+  - ETH_USD
+
+# Timeframes
+timeframes:
+  swing: ["1D", "4H", "1H", "15m"]
+  scalp: ["15m", "5m", "1m"]
+
+# Session Filters
+session_filters_enabled: true
+killzones:
+  London: "07:00-10:00"
+  NY: "13:30-16:00"
+
+# Data Sources
+data_sources:
+  primary: "alphavantage"  # alphavantage, oanda, marketaux, newsdata
+  backup: "oanda"
+  api_keys:
+    # Alpha Vantage API (Real-time Market Data)
+    alphavantage:
+      api_key: "LSBZJ73J9W1G8FWB"
+      base_url: "https://www.alphavantage.co/query"
+      rate_limit_per_minute: 5  # Free tier limit
+      rate_limit_per_day: 500   # Free tier limit
+    
+    # OANDA API (FX/CFD Trading)
+    oanda:
+      api_key: "d5d9a1d481fd07b5ec39214873639129-4c7188797832a4f3d59d5268e0dfb64b"
+      account_id: "001-004-13116062-001"  # Use the main account
+      environment: "live"  # practice or live
+      base_url: "https://api-fxtrade.oanda.com"  # Use live environment
+      # Note: This is your Personal Access Token, not a traditional API key
+    
+    # MarketAux API (Market Data & News)
+    marketaux:
+      api_key: "qL23wrqpBdU908DrznhIpfINVOgDg4bPmpKzQfW2"
+      base_url: "https://api.marketaux.com/v1"
+    # FinancialModelingPrep (FMP) for economic calendar fallback (live)
+    fmp:
+      api_key: "XaZrx5fB6UEM5xoSHPjPEO6crJ1zDe6J"
+    
+    # NewsData.io API (News & Sentiment)
+    newsdata:
+      api_key: "pub_f8e040b68d614a31b36877ea5fbd6732"
+      base_url: "https://newsdata.io/api/1"
+    
+    # Google Gemini API (AI/LLM)
+    gemini:
+      api_key: "AIzaSyD_wDE-yln3RxNlSKVRuWcrbG54O_0gk6s"
+      model: "gemini-1.5-flash"  # Use flash model which has higher limits
+      max_tokens: 1000
+
+# ML Settings
+ml:
+  enabled: true
+  model_path: "ml/models/signal_classifier.pkl"
+  retrain_interval_days: 7
+  min_samples_for_training: 100
+  confidence_threshold: 0.7
+
+# Caching
+caching:
+  enabled: true
+  cache_duration_minutes: 30  # Increased cache duration to 30 minutes
+  max_cache_size_mb: 100
+
+# Pattern Detection Settings
+patterns:
+  fvg:
+    min_gap_size: 0.0001  # Minimum gap size for FVG
+    max_lookback: 20      # Bars to look back for FVG
+  ote:
+    min_retracement: 0.62
+    max_retracement: 0.79
+    min_swing_size: 0.001  # Minimum swing size for OTE
+  liquidity_sweep:
+    min_sweep_size: 0.0005  # Minimum sweep size
+    confirmation_bars: 3     # Bars to confirm sweep
+
+# Market Regime Settings
+market_regime:
+  adx_threshold: 25
+  atr_percentage_threshold: 0.5
+  min_trend_bars: 10
+
+# Risk Management
+risk_management:
+  max_risk_per_trade: 0.01  # 1% of account
+  max_portfolio_risk: 0.05   # 5% of account
+  max_correlation_risk: 0.7  # Maximum correlation risk
+  max_correlation: 0.7      # Maximum correlation between positions
+  max_positions: 5          # Maximum concurrent positions
+  position_sizing_method: "kelly"  # kelly, fixed, volatility_based
+  position_sizing:
+    enabled: true
+    method: "kelly"  # kelly, fixed, volatility_based
+
+# Performance Tracking
+performance:
+  track_trades: true
+  database_url: "sqlite:///trades.db"
+  metrics:
+    - win_rate
+    - average_rr
+    - sharpe_ratio
+    - max_drawdown
+
+# Logging
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: "logs/quant_strategy.log"
+  max_file_size_mb: 10
+  backup_count: 5
+
+# API Settings
+api:
+  lovable_dev_url: "https://api.lovable.dev/your_agent_endpoint"
+  webhook_url: "https://your-webhook-url.com/signals"
+  timeout_seconds: 30
+  retry_attempts: 3
+
+# Automation
+automation:
+  fetch_intervals:
+    oanda: 300  # 5 minutes - Conservative approach
+    gemini: 7200  # 2 hours - Very conservative for Gemini
+    marketaux: 3600  # 1 hour - Conservative for MarketAux
+    newsdata: 7200  # 2 hours - Conservative for NewsData
+
+default_symbols:
+  - EUR_USD
+  - GBP_USD
+  - USD_JPY
+  - AUD_USD
+  - USD_CAD
+  - USD_CHF
+  - NZD_USD
+  - XAU_USD
