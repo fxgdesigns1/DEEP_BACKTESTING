@@ -1,0 +1,112 @@
+backtesting:
+  auto_export_enabled: true
+  commission_rate: 0.0001
+  data_source: oanda
+  default_initial_balance: 10000.0
+  default_mode: historical
+  export_directory: backtesting_data
+  export_interval_hours: 24
+  include_commission: true
+  include_slippage: true
+  include_spread: true
+performance_metrics:
+  metrics_to_track:
+  - total_return
+  - annualized_return
+  - max_drawdown
+  - sharpe_ratio
+  - sortino_ratio
+  - win_rate
+  - profit_factor
+  - avg_win_loss_ratio
+  - expectancy
+  - avg_trade_duration
+  - max_consecutive_wins
+  - max_consecutive_losses
+  risk_free_rate: 0.03
+  trading_days_per_year: 252
+slippage_simulation:
+  base_slippage_pips:
+    AUD_USD: 0.3
+    EUR_USD: 0.1
+    GBP_USD: 0.2
+    NZD_USD: 0.4
+    USD_CAD: 0.3
+    USD_JPY: 0.2
+    XAU_USD: 0.5
+  news_factor: 0.8
+  volatility_factor: 0.5
+  volume_factor: -0.3
+spread_modeling:
+  instrument_factors:
+    AUD_USD: 1.2
+    EUR_USD: 1.0
+    GBP_USD: 1.1
+    NZD_USD: 1.3
+    USD_CAD: 1.2
+    USD_JPY: 1.0
+    XAU_USD: 1.5
+  news_impact:
+    high_impact: 2.0
+    low_impact: 1.2
+    medium_impact: 1.5
+  session_factors:
+    asian: 1.2
+    european: 1.0
+    overlap: 0.9
+    us: 1.0
+    weekend: 1.5
+strategies:
+  alpha_strategy:
+    optimization:
+      ema_periods:
+      - 3
+      - 8
+      - 21
+      max_trades_per_day: 50
+      min_signal_strength: 0.35
+      momentum_period: 10
+      risk_per_trade: 0.02
+      stop_loss_pct: 0.002
+      take_profit_pct: 0.003
+    validation:
+      drawdown_tolerance: 0.05
+      frequency_tolerance: 0.2
+      return_tolerance: 0.1
+      win_rate_tolerance: 0.05
+  gold_scalping:
+    optimization:
+      max_spread: 1.5
+      max_trades_per_day: 50
+      min_price_history: 20
+      min_signal_strength: 0.35
+      min_volatility: 2.5e-05
+      risk_per_trade: 0.02
+      stop_loss_pips: 8
+      support_resistance_tolerance: 0.002
+      take_profit_pips: 12
+    validation:
+      drawdown_tolerance: 0.05
+      frequency_tolerance: 0.2
+      return_tolerance: 0.1
+      win_rate_tolerance: 0.05
+  ultra_strict_forex:
+    optimization:
+      ema_periods:
+      - 3
+      - 8
+      - 21
+      macd_tolerance: 0.05
+      max_trades_per_day: 25
+      min_price_history: 15
+      min_signal_strength: 0.35
+      risk_per_trade: 0.02
+      rsi_buy_threshold: 45
+      rsi_sell_threshold: 55
+      stop_loss_pct: 0.002
+      take_profit_pct: 0.003
+    validation:
+      drawdown_tolerance: 0.05
+      frequency_tolerance: 0.2
+      return_tolerance: 0.1
+      win_rate_tolerance: 0.05

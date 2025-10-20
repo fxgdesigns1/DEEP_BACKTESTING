@@ -1,0 +1,22 @@
+# strategies/prop_firm_challenge.yaml
+name: Prop Firm Challenge
+type: Constraints-aware variant
+parameters:
+  daily_risk_budget_pct:
+    range: [0.5, 1.5]
+    step: 0.1
+  per_trade_risk_pct:
+    range: [0.10, 0.40]
+    step: 0.05
+  max_open_risk_pct:
+    range: [0.5, 1.5]
+    step: 0.1
+  news_block_minutes_pre_post:
+    range: [0, 60]
+    step: 5
+  trading_hours_utc:
+    start_range: ["06:00","07:00"]
+    end_range: ["20:00","21:00"]
+    step_minutes: 15
+constraints:
+  enforce_prop_limits: true

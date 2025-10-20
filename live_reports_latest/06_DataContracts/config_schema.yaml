@@ -1,0 +1,23 @@
+# Minimal schema hints for optimized_backtesting_config.yaml consumers
+backtesting:
+  default_mode: [historical, live_simulation, walk_forward, optimization]
+  data_source: [oanda, bloomberg, csv, database]
+  include_slippage: bool
+  include_spread: bool
+  include_commission: bool
+
+strategies:
+  <strategy_id>:
+    optimization:
+      ema_periods: [int]
+      stop_loss_pct: float
+      take_profit_pct: float
+      momentum_period: int
+      min_signal_strength: float
+      max_trades_per_day: int
+      risk_per_trade: float
+    validation:
+      win_rate_tolerance: float
+      return_tolerance: float
+      drawdown_tolerance: float
+      frequency_tolerance: float

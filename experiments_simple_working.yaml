@@ -1,0 +1,90 @@
+meta:
+  run_name: simple_working_search
+  results_dir: results
+  seed: 1337
+  holdout_months: 6
+  wfo_test_months: 2
+  embargo_hours: 12
+  use_bayesian: false
+
+risk:
+  capital: 100000
+  risk_per_trade: [0.01, 0.02]
+  max_drawdown: 0.15
+
+costs:
+  spread_pips: [2, 3]
+  slippage_pips: [0.5, 1.0]
+
+universe:
+  pairs: [EUR_USD, GBP_USD, USD_JPY, AUD_USD, XAU_USD]
+  timeframes: [1h, 4h, 1d]
+  strategies:
+    - simple_working_strategy
+
+search_space:
+  # Simple parameters for the working strategy
+  simple_working_strategy:
+    ema_fast: [8, 12, 20]
+    ema_slow: [21, 26, 50]
+    rsi_period: [14, 21]
+    rsi_oversold: [25, 30]
+    rsi_overbought: [70, 75]
+    stop_atr_mult: [1.5, 2.0, 2.5]
+    take_profit_rr: [1.5, 2.0, 3.0]
+
+robustness:
+  mc_trials: 500
+  param_perturbation_pct: 0.1
+  cost_stress_spread_pips: [3]
+  cost_stress_slippage_pips: [1.0]
+
+selection:
+  min_trades_low_tf: 50      # Very relaxed for testing
+  min_trades_high_tf: 30     # Very relaxed for testing
+  min_oos_sharpe: 0.5        # Very relaxed for testing
+  min_oos_sortino: 0.5       # Very relaxed for testing
+  max_oos_dd: 0.20           # Relaxed for testing
+  max_sharpe_drop_under_stress: 0.5
+  min_profit_factor: 1.1     # Very relaxed for testing
+  min_win_rate: 0.35         # Very relaxed for testing
+
+data_validation:
+  min_completeness: 0.85
+  max_critical_gaps: 3
+  min_data_points: 500
+  validation_layers: 3
+
+engines:
+  professional_backtesting:
+    class: ProfessionalBacktestingSystem
+    module: professional_backtesting_system
+    timeframes: [1h]
+  
+  multi_timeframe_backtesting:
+    class: MultiTimeframeBacktestingSystem
+    module: multi_timeframe_backtesting_system
+    timeframes: [1h, 4h, 1d]
+
+strategies:
+  simple_working_strategy:
+    class: SimpleWorkingStrategy
+    module: simple_working_strategy
+    features: [ema_crossover, rsi_filter, atr_stops]
+
+validation:
+  advanced_validation:
+    class: AdvancedValidationFramework
+    module: advanced_validation_framework
+    features: [walk_forward_analysis, monte_carlo_validation, out_of_sample_testing]
+  
+  risk_management:
+    class: RiskManagementFramework
+    module: risk_management_framework
+    features: [position_sizing, risk_limits, portfolio_tracking]
+  
+  data_gap_analysis:
+    class: ProfessionalDataGapAnalyzer
+    module: professional_data_gap_analyzer
+    features: [gap_detection, data_quality_assessment, completeness_analysis]
+

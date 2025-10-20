@@ -1,0 +1,192 @@
+# Optimized Backtesting Configuration
+# September 23, 2025
+# Version: 1.2.0
+
+# Global Backtesting Settings
+backtesting:
+  default_mode: "historical"  # Options: historical, live_simulation, walk_forward, optimization
+  data_source: "oanda"        # Options: oanda, bloomberg, csv, database
+  include_slippage: true
+  include_spread: true
+  include_commission: true
+  commission_rate: 0.0001     # 0.01% commission
+  default_initial_balance: 10000.0
+  export_directory: "backtesting_data"
+  auto_export_enabled: true
+  export_interval_hours: 24
+
+# Bloomberg Integration Settings
+bloomberg_integration:
+  enabled: true
+  ticker_mapping:
+    EUR_USD: "EURUSD Curncy"
+    GBP_USD: "GBPUSD Curncy"
+    USD_JPY: "USDJPY Curncy"
+    AUD_USD: "AUDUSD Curncy"
+    USD_CAD: "USDCAD Curncy"
+    NZD_USD: "NZDUSD Curncy"
+    XAU_USD: "XAUUSD Curncy"
+  data_fields:
+    - "PX_LAST"
+    - "PX_BID"
+    - "PX_ASK"
+    - "PX_MID"
+    - "VOLUME"
+  validation_frequency: "daily"
+
+# Strategy-Specific Backtesting Parameters
+strategies:
+  alpha_strategy:
+    optimization:
+      ema_periods: [3, 8, 21]
+      stop_loss_pct: 0.002     # 0.20%
+      take_profit_pct: 0.003   # 0.30%
+      momentum_period: 10
+      min_signal_strength: 0.35
+      max_trades_per_day: 50
+      risk_per_trade: 0.02     # 2%
+    validation:
+      win_rate_tolerance: 0.05  # 5%
+      return_tolerance: 0.10    # 10%
+      drawdown_tolerance: 0.05  # 5%
+      frequency_tolerance: 0.20 # 20%
+
+  gold_scalping:
+    optimization:
+      stop_loss_pips: 8
+      take_profit_pips: 12
+      max_spread: 1.5
+      min_volatility: 0.000025
+      support_resistance_tolerance: 0.002  # 0.2%
+      min_price_history: 20
+      min_signal_strength: 0.35
+      max_trades_per_day: 10  # REDUCED from 50 - overtrading issue (Oct 13, 2025)
+      risk_per_trade: 0.02     # 2%
+      disabled_pairs: [XAU_USD]  # Disabled due to overtrading and negative P&L
+    validation:
+      win_rate_tolerance: 0.05  # 5%
+      return_tolerance: 0.10    # 10%
+      drawdown_tolerance: 0.05  # 5%
+      frequency_tolerance: 0.20 # 20%
+
+  ultra_strict_forex:
+    optimization:
+      ema_periods: [3, 8, 21]
+      stop_loss_pct: 0.002     # 0.20%
+      take_profit_pct: 0.003   # 0.30%
+      rsi_buy_threshold: 45    # Buy when RSI below this
+      rsi_sell_threshold: 55   # Sell when RSI above this
+      macd_tolerance: 0.05     # 5% tolerance for MACD comparison
+      min_price_history: 15
+      min_signal_strength: 0.40  # UPDATED from 0.35 based on live trading (Oct 13, 2025)
+      max_trades_per_day: 25
+      risk_per_trade: 0.02     # 2%
+      disabled_pairs: [GBP_USD, USD_JPY]  # Disabled due to poor live performance
+    validation:
+      win_rate_tolerance: 0.05  # 5%
+      return_tolerance: 0.10    # 10%
+      drawdown_tolerance: 0.05  # 5%
+      frequency_tolerance: 0.20 # 20%
+
+  momentum:
+    optimization:
+      min_momentum: 0.002
+      sl_atr: 1.0
+      tp_atr: 1.5
+      max_trades_per_day: 20
+      risk_per_trade: 0.02     # 2%
+      disabled_pairs: [NZD_USD]  # Disabled due to poor live performance (Oct 13, 2025)
+    validation:
+      win_rate_tolerance: 0.05  # 5%
+      return_tolerance: 0.10    # 10%
+      drawdown_tolerance: 0.05  # 5%
+      frequency_tolerance: 0.20 # 20%
+
+# Spread Modeling Configuration
+spread_modeling:
+  session_factors:
+    asian: 1.2        # Asian session typically has wider spreads
+    european: 1.0     # European session as baseline
+    us: 1.0           # US session
+    overlap: 0.9      # Overlap periods have tighter spreads
+    weekend: 1.5      # Weekend has wider spreads
+  instrument_factors:
+    EUR_USD: 1.0      # Base factor for EUR/USD
+    GBP_USD: 1.1      # GBP/USD typically has slightly wider spreads
+    USD_JPY: 1.0
+    AUD_USD: 1.2
+    USD_CAD: 1.2
+    NZD_USD: 1.3
+    XAU_USD: 1.5      # Gold typically has wider spreads
+  news_impact:
+    high_impact: 2.0  # High impact news can double spreads
+    medium_impact: 1.5
+    low_impact: 1.2
+
+# Slippage Simulation Configuration
+slippage_simulation:
+  base_slippage_pips:
+    EUR_USD: 0.1
+    GBP_USD: 0.2
+    USD_JPY: 0.2
+    AUD_USD: 0.3
+    USD_CAD: 0.3
+    NZD_USD: 0.4
+    XAU_USD: 0.5
+  volatility_factor: 0.5  # Higher volatility increases slippage
+  volume_factor: -0.3     # Higher volume reduces slippage (negative correlation)
+  news_factor: 0.8        # News events increase slippage
+
+# Performance Metrics Configuration
+performance_metrics:
+  risk_free_rate: 0.03    # 3% annual risk-free rate for Sharpe calculation
+  trading_days_per_year: 252
+  metrics_to_track:
+    - "total_return"
+    - "annualized_return"
+    - "max_drawdown"
+    - "sharpe_ratio"
+    - "sortino_ratio"
+    - "win_rate"
+    - "profit_factor"
+    - "avg_win_loss_ratio"
+    - "expectancy"
+    - "avg_trade_duration"
+    - "max_consecutive_wins"
+    - "max_consecutive_losses"
+
+# Validation Metrics Configuration
+validation_metrics:
+  win_rate_comparison: true
+  return_comparison: true
+  drawdown_comparison: true
+  trade_frequency_comparison: true
+  pips_per_trade_comparison: true
+  comparison_periods:
+    daily_comparison: true
+    weekly_comparison: true
+    monthly_comparison: true
+    quarterly_comparison: true
+    rolling_30_day: true
+
+# Export Format Configuration
+export_formats:
+  json: true
+  csv: true
+  parquet: false
+  pickle: false
+
+# Optimization Methods
+optimization_methods:
+  default: "grid_search"  # Options: grid_search, random_search, bayesian, genetic
+  grid_search:
+    resolution: "medium"  # Options: low, medium, high
+  random_search:
+    iterations: 100
+  bayesian:
+    iterations: 50
+    exploration_factor: 0.1
+  genetic:
+    population_size: 50
+    generations: 20
+    mutation_rate: 0.1

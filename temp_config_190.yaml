@@ -1,0 +1,421 @@
+data_requirements:
+  max_missing_data_pct: 0.01
+  min_data_years: 3
+  recommended_fields:
+  - spread
+  - tick_volume
+  - bid
+  - ask
+  require_complete_sessions: true
+  require_news_data: true
+  required_fields:
+  - timestamp
+  - open
+  - high
+  - low
+  - close
+  - volume
+  required_timeframes:
+  - 15min
+  - 1hour
+  - 4hour
+  - daily
+execution:
+  commission:
+    currency: USD
+    enabled: true
+    per_lot: 7.0
+  slippage_model:
+    base_slippage_pips: 0.3
+    news_slippage:
+      high_impact: 10.0
+      low_impact: 0.5
+      medium_impact: 2.0
+    session_slippage:
+      asian: 1.5
+      london: 0.3
+      london_ny_overlap: 0.2
+      ny: 0.3
+      weekend: 3.0
+    type: volatility_based
+    volatility_multiplier_enabled: true
+  spread_model:
+    base_spreads:
+      AUD_JPY: 1.2
+      AUD_USD: 1.0
+      EUR_JPY: 1.1
+      EUR_USD: 0.8
+      GBP_JPY: 1.4
+      GBP_USD: 1.2
+      NZD_USD: 1.3
+      USD_CAD: 1.2
+      USD_JPY: 0.9
+      XAU_USD: 0.5
+    news_multipliers:
+      high_impact: 5.0
+      low_impact: 1.2
+      medium_impact: 2.0
+    session_multipliers:
+      asian: 2.5
+      london: 1.0
+      london_ny_overlap: 0.8
+      ny: 1.0
+      off_hours: 2.0
+      weekend: 5.0
+    type: dynamic
+    volatility_multiplier_enabled: true
+    volatility_scale_factor: 1000
+global:
+  commission_rate: 0.0001
+  data_source: oanda
+  enable_logging: true
+  export_directory: backtesting_results_oct2025
+  initial_capital: 10000.0
+  log_level: INFO
+logging:
+  level: INFO
+  log_file: improved_backtesting_oct2025.log
+  log_htf_alignment: true
+  log_news_events: true
+  log_quality_scores: true
+  log_signals: true
+  log_trades: true
+multi_timeframe:
+  enabled: true
+  higher_timeframes:
+    15min: 4hour
+    1hour: daily
+  htf_alignment:
+    enabled: true
+    lookback_long: 50
+    lookback_short: 20
+    neutral_allowed: true
+    required: true
+  primary_timeframes:
+    gold_scalping: 15min
+    momentum_trading: 1hour
+    ultra_strict_forex: 15min
+news:
+  enabled: true
+  event_types:
+  - Fed Rate Decision
+  - ECB Rate Decision
+  - BOE Rate Decision
+  - BOJ Rate Decision
+  - Non-Farm Payrolls
+  - NFP
+  - CPI
+  - GDP
+  - Unemployment Rate
+  - Retail Sales
+  - Manufacturing PMI
+  pause_settings:
+    enabled: true
+    high_impact_only: true
+    pause_after_minutes: 30
+    pause_before_minutes: 30
+  sentiment_settings:
+    boost_factor: 0.2
+    boost_threshold: 0.0
+    enabled: true
+    strong_boost_factor: 0.3
+    strong_boost_threshold: 0.3
+notes: 'This configuration implements all critical improvements from the live trading
+  system:
+
+
+  1. Dynamic spread modeling (session + volatility + news)
+
+  2. Multi-timeframe alignment requirements
+
+  3. News event integration with pause mechanism
+
+  4. Signal quality scoring (0-100 point system)
+
+  5. Session-based filtering (London/NY priority)
+
+  6. Pullback entry detection
+
+  7. Time spacing between trades (30 min minimum)
+
+  8. ATR-based dynamic stops (momentum strategy)
+
+  9. Improved R:R ratios (1:3 to 1:4)
+
+
+  CRITICAL PRIORITIES:
+
+  - Priority 1: Dynamic spread modeling (20-30% accuracy improvement)
+
+  - Priority 2: Multi-timeframe analysis (filters 40-50% of bad signals)
+
+  - Priority 3: News event integration (prevents extreme slippage)
+
+
+  EXPECTED RESULTS:
+
+  - Backtest-to-live drift < 10%
+
+  - Sharpe ratio > 2.0
+
+  - Max drawdown < 10%
+
+  - Win rate 55-65% with 1:3 R:R
+
+  - Signal quality avg 70+
+
+  - HTF alignment rate > 75%
+
+
+  Version: 2.1.0
+
+  Date: October 1, 2025
+
+  Based on: Live Trading System Week of Oct 1, 2025 Improvements
+
+  '
+optimization:
+  constraints:
+    max_drawdown_limit: 0.2
+    min_profit_factor: 1.5
+    min_trades_per_test: 30
+  enabled: true
+  method: walk_forward
+  optimization_metric: sharpe_ratio
+  parameter_ranges:
+    min_signal_strength:
+    - 0.6
+    - 0.65
+    - 0.7
+    - 0.75
+    stop_loss_pct:
+    - 0.003
+    - 0.004
+    - 0.005
+    - 0.006
+    take_profit_pct:
+    - 0.015
+    - 0.018
+    - 0.02
+    - 0.025
+  walk_forward:
+    enabled: true
+    step_size_months: 3
+    test_period_months: 3
+    training_period_months: 12
+reporting:
+  formats:
+  - json
+  - csv
+  - html
+  performance_metrics:
+  - total_return
+  - annualized_return
+  - max_drawdown
+  - sharpe_ratio
+  - sortino_ratio
+  - win_rate
+  - profit_factor
+  - avg_win_loss_ratio
+  - expectancy
+  - avg_trade_duration
+  - max_consecutive_wins
+  - max_consecutive_losses
+  quality_metrics:
+  - avg_quality_score
+  - quality_score_distribution
+  - quality_vs_profitability
+  - htf_alignment_rate
+  - pullback_entry_rate
+  - session_distribution
+  sections:
+  - summary
+  - equity_curve
+  - drawdown_chart
+  - trade_distribution
+  - session_analysis
+  - news_impact
+  - signal_quality
+  - parameter_stability
+  - validation_results
+signal_quality:
+  enabled: true
+  min_quality_score: 60
+  quality_position_sizing:
+    enabled: true
+    high_quality_threshold: 80
+    low_quality_multiplier: 0.5
+    medium_quality_threshold: 60
+  weights:
+    entry_timing: 25
+    market_conditions: 25
+    news_sentiment: 10
+    technical_strength: 25
+    timeframe_alignment: 25
+strategies:
+  gold_scalping:
+    enabled: true
+    entry:
+      allowed_sessions:
+      - london
+      - ny
+      - london_ny_overlap
+      breakout_lookback: 15
+      breakout_threshold: 0.004
+      impulse_lookback: 10
+      impulse_threshold: 0.003
+      max_spread: 0.6
+      min_signal_strength: 0.7
+      min_time_between_trades_minutes: 30
+      min_volatility: 8.0e-05
+      only_london_ny_sessions: true
+      pullback_ema_period: 21
+      pullback_threshold: 0.001
+      require_pullback: true
+    exit:
+      risk_reward_ratio: 3.75
+      stop_loss_pips: 8
+      take_profit_pips: 30
+      use_atr_stops: false
+      use_trailing_stop: false
+    instruments:
+    - XAU_USD
+    news:
+      enabled: true
+      high_impact_events:
+      - Fed Rate Decision
+      - CPI
+      - Non-Farm Payrolls
+      - GDP
+      pause_after_minutes: 30
+      pause_before_minutes: 30
+      pause_on_fed_events: true
+      pause_on_high_impact: true
+      sentiment_boost_enabled: true
+      sentiment_boost_factor: 0.2
+    risk:
+      max_daily_trades: 20
+      max_positions: 3
+      portfolio_risk_limit: 0.06
+      risk_per_trade_pct: 0.02
+  momentum_trading:
+    enabled: true
+    entry:
+      min_adx: 20
+      min_momentum: 0.3
+      min_signal_strength: 0.5
+      min_time_between_trades_minutes: 30
+      min_volume_score: 0.25
+      momentum_period: 14
+      only_london_ny_sessions: false
+    exit:
+      atr_period: 14
+      break_even_atr_threshold: 1.5
+      risk_reward_ratio: 3.33
+      stop_loss_atr_multiplier: 1.5
+      take_profit_atr_multiplier: 5.0
+      trailing_stop_atr_multiplier: 1.0
+      use_atr_stops: true
+      use_trailing_stop: true
+    instruments:
+    - EUR_USD
+    - GBP_USD
+    - USD_JPY
+    - AUD_USD
+    - USD_CAD
+    - NZD_USD
+    - EUR_JPY
+    - GBP_JPY
+    - AUD_JPY
+    news:
+      alignment_bonus: 0.05
+      enabled: true
+      pause_on_high_impact: true
+      sentiment_boost_enabled: true
+      sentiment_boost_factor: 0.2
+    risk:
+      jpy_position_multiplier: 1.5
+      max_daily_trades: 60
+      max_positions: 7
+      portfolio_risk_limit: 0.15
+      risk_per_trade_pct: 0.025
+  ultra_strict_forex:
+    enabled: true
+    entry:
+      allowed_sessions:
+      - london
+      - ny
+      - london_ny_overlap
+      ema_periods:
+      - 3
+      - 8
+      - 21
+      htf_lookback_long: 50
+      htf_lookback_short: 20
+      macd_above_signal_required: true
+      max_rsi: 50
+      min_rsi: 50
+      min_signal_strength: 0.75
+      min_time_between_trades_minutes: 30
+      only_london_ny_sessions: true
+      require_ema_alignment: true
+      require_htf_alignment: true
+      require_momentum_confirmation: true
+      require_pullback: false
+    exit:
+      risk_reward_ratio: 4.0
+      stop_loss_pct: 0.005
+      take_profit_pct: 0.02
+      use_atr_stops: false
+      use_trailing_stop: false
+    instruments:
+    - EUR_USD
+    - GBP_USD
+    - USD_JPY
+    - AUD_USD
+    news:
+      enabled: true
+      high_impact_events:
+      - Fed Rate Decision
+      - ECB Rate Decision
+      - BOE Rate Decision
+      - Non-Farm Payrolls
+      - CPI
+      - GDP
+      pause_after_minutes: 30
+      pause_before_minutes: 30
+      pause_on_high_impact: true
+      sentiment_boost_enabled: true
+      sentiment_boost_factor: 0.2
+    risk:
+      max_daily_trades: 25
+      max_positions: 5
+      portfolio_risk_limit: 0.1
+      risk_per_trade_pct: 0.025
+success_criteria:
+  backtest_live_drift_limit: 0.1
+  max_drawdown_limit: 0.1
+  min_profit_factor: 2.5
+  target_htf_alignment_rate: 0.75
+  target_sharpe_ratio: 2.0
+  target_signal_quality: 70
+  target_win_rate: 0.6
+validation:
+  enabled: true
+  metrics:
+  - win_rate
+  - profit_factor
+  - max_drawdown
+  - sharpe_ratio
+  - avg_trade_duration
+  - trade_frequency
+  on_failure:
+    action: alert
+    recalibrate: true
+    suggest_adjustments: true
+  tolerances:
+    max_drawdown: 0.03
+    profit_factor: 0.2
+    sharpe_ratio: 0.3
+    trade_frequency: 0.2
+    win_rate: 0.05

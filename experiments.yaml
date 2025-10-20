@@ -1,0 +1,166 @@
+meta:
+  run_name: ultimate_strategy_search
+  results_dir: results
+  seed: 1337
+  holdout_months: 9           # untouched, most-recent
+  wfo_test_months: 3          # OOS slice length per step
+  embargo_hours: 24           # to prevent leakage around fold boundaries
+  use_bayesian: true          # if Optuna available; else grid is used
+
+risk:
+  capital: 100000
+  risk_per_trade: [0.01, 0.015, 0.02]
+  max_drawdown: 0.15
+
+costs:
+  spread_pips: [2, 3, 5]
+  slippage_pips: [0.5, 1.0]
+
+universe:
+  pairs: [EUR_USD, GBP_USD, USD_JPY, AUD_USD, USD_CAD, USD_CHF, NZD_USD, EUR_JPY, GBP_JPY, XAU_USD]
+  timeframes: [1m, 5m, 15m, 30m, 1h, 4h, 1d, 1w]
+  strategies:
+    - comprehensive_enhanced_strategy
+    - ultra_strict_v3_strategy
+    - news_enhanced_strategy
+    - enhanced_optimized_strategy
+
+search_space:
+  # Technical indicators
+  ema_fast: [8, 12, 20]
+  ema_slow: [21, 50, 100]
+  rsi_period: [14, 21]
+  rsi_bounds:
+    - [30, 70]
+    - [20, 80]
+  macd_fast: [8, 12]
+  macd_slow: [21, 26]
+  macd_signal: [7, 9]
+  atr_period: [14, 21]
+  
+  # Risk management
+  stop_atr_mult: [1.2, 1.6, 2.0, 2.5]
+  take_profit_rr: [1.5, 2.0, 2.5, 3.0]
+  trailing_atr_mult: [null, 1.0, 1.5]
+  
+  # Session filtering
+  session: [ALL, LONDON, NEW_YORK, TOKYO, OVERLAP_LDN_NY]
+  news_blackout_minutes: [0, 30, 60, 120]
+  
+  # Regime filtering
+  regime_filter:
+    type: [NONE, TREND, RANGE]
+    adx_threshold: [20, 25, 30]
+    bb_width_pct: [20, 30, 40]
+  
+  # Strategy-specific parameters
+  comprehensive_enhanced:
+    min_confidence: [70, 75, 80]
+    news_weight: [0.2, 0.3, 0.4]
+    indicators_weight: [0.3, 0.4, 0.5]
+    technical_weight: [0.2, 0.3, 0.4]
+    min_volume_multiplier: [1.2, 1.5, 2.0]
+    min_atr_multiplier: [1.0, 1.2, 1.5]
+    max_daily_trades: [2, 3, 5]
+    min_pips_threshold: [8, 10, 15]
+  
+  ultra_strict_v3:
+    min_rr_ratio: [2.5, 3.0, 3.5]
+    min_confidence: [80, 85, 90]
+    min_volume_multiplier: [1.5, 2.0, 2.5]
+    min_atr_multiplier: [1.2, 1.5, 2.0]
+    max_daily_trades: [1, 2, 3]
+    min_pips_threshold: [12, 15, 20]
+    min_adx_trend: [20, 25, 30]
+    news_impact_threshold: [0.6, 0.8, 1.0]
+    sentiment_threshold: [0.6, 0.7, 0.8]
+  
+  news_enhanced:
+    min_rr_ratio: [1.8, 2.0, 2.2]
+    min_confidence: [65, 70, 75]
+    min_volume_multiplier: [1.3, 1.5, 1.8]
+    min_atr_multiplier: [1.1, 1.2, 1.4]
+    max_daily_trades: [2, 3, 4]
+    min_pips_threshold: [8, 10, 12]
+    news_impact_threshold: [0.4, 0.5, 0.6]
+    news_confidence_boost: [0.05, 0.1, 0.15]
+    news_confidence_penalty: [0.1, 0.2, 0.3]
+  
+  enhanced_optimized:
+    rsi_oversold: [20, 25, 30]
+    rsi_overbought: [70, 75, 80]
+    ema_short: [12, 20, 26]
+    ema_long: [50, 100, 200]
+    volume_threshold: [1.0, 1.2, 1.5]
+    atr_multiplier: [1.5, 2.0, 2.5]
+    take_profit_multiplier: [3.0, 4.0, 5.0]
+
+robustness:
+  mc_trials: 1000
+  param_perturbation_pct: 0.15
+  cost_stress_spread_pips: [3, 5]
+  cost_stress_slippage_pips: [1.0]
+
+selection:
+  min_trades_low_tf: 400
+  min_trades_high_tf: 150
+  min_oos_sharpe: 1.2
+  min_oos_sortino: 1.6
+  max_oos_dd: 0.12
+  max_sharpe_drop_under_stress: 0.3
+  min_profit_factor: 1.3
+  min_win_rate: 0.45
+
+data_validation:
+  min_completeness: 0.90
+  max_critical_gaps: 2
+  min_data_points: 1000
+  validation_layers: 5
+
+engines:
+  professional_backtesting:
+    class: ProfessionalBacktestingSystem
+    module: professional_backtesting_system
+    timeframes: [1h]
+  
+  multi_timeframe_backtesting:
+    class: MultiTimeframeBacktestingSystem
+    module: multi_timeframe_backtesting_system
+    timeframes: [1m, 5m, 15m, 30m, 1h, 4h, 1d, 1w]
+
+strategies:
+  comprehensive_enhanced_strategy:
+    class: ComprehensiveEnhancedStrategy
+    module: strategies.comprehensive_enhanced_strategy
+    features: [news_integration, indicators_integration, technical_analysis]
+  
+  ultra_strict_v3_strategy:
+    class: UltraStrictV3Strategy
+    module: strategies.ultra_strict_v3_strategy
+    features: [ai_insights, ultra_strict_criteria, high_confidence]
+  
+  news_enhanced_strategy:
+    class: NewsEnhancedStrategy
+    module: strategies.news_enhanced_strategy
+    features: [news_integration, sentiment_analysis, economic_events]
+  
+  enhanced_optimized_strategy:
+    class: EnhancedOptimizedStrategy
+    module: strategies.enhanced_optimized_strategy
+    features: [market_regime_detection, dynamic_risk_management, session_filtering]
+
+validation:
+  advanced_validation:
+    class: AdvancedValidationFramework
+    module: advanced_validation_framework
+    features: [walk_forward_analysis, monte_carlo_validation, out_of_sample_testing]
+  
+  risk_management:
+    class: RiskManagementFramework
+    module: risk_management_framework
+    features: [position_sizing, risk_limits, portfolio_tracking]
+  
+  data_gap_analysis:
+    class: ProfessionalDataGapAnalyzer
+    module: professional_data_gap_analyzer
+    features: [gap_detection, data_quality_assessment, completeness_analysis]

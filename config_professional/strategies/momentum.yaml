@@ -1,0 +1,21 @@
+# strategies/momentum.yaml
+name: Momentum
+type: Trend-following
+parameters:
+  ma_fast:
+    range: [10, 40]
+    step: 1
+  ma_slow:
+    range: [60, 200]
+    step: 5
+    constraint: "ma_fast < ma_slow"
+  pullback_depth_pct_atr:
+    range: [20, 70]
+    step: 5
+    jitter: 2
+  breakout_buffer_pips:
+    range: [0, 8]
+    step: 1
+  trailing_stop_atr:
+    range: [1.0, 3.0]
+    step: 0.1

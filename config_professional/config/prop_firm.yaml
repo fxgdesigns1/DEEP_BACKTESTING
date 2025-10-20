@@ -1,0 +1,13 @@
+# config/prop_firm.yaml
+limits:
+  daily_drawdown: 0.05
+  total_drawdown: 0.10
+  stop_trading_daily_loss: 0.04
+  per_trade_risk_max: 0.0035
+  max_positions: 3
+  news_pause_minutes: 45
+  trading_hours_utc: ["06:00","21:00"]
+  weekend_hold: false
+circuit_breakers:
+  consecutive_losing_days: 3
+  drawdown_in_R: 6

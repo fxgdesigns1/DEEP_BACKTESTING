@@ -1,0 +1,218 @@
+meta:
+  run_name: ultimate_strategy_search_high_performance
+  results_dir: results
+  seed: 1337
+  holdout_months: 6           # Reduced for faster testing
+  wfo_test_months: 2          # Reduced for faster testing
+  embargo_hours: 12           # Reduced for faster testing
+  use_bayesian: true          # Use Optuna for intelligent search
+  parallel_workers: 16        # Use all 5950x cores
+  gpu_acceleration: true      # Enable GPU for calculations
+  memory_limit_gb: 56         # Use most of 64GB RAM
+  batch_size: 1000            # Large batches for NVMe efficiency
+
+risk:
+  capital: 100000
+  risk_per_trade: [0.008, 0.012, 0.015, 0.018, 0.02, 0.025]  # More granular
+  max_drawdown: 0.15
+
+costs:
+  spread_pips: [1.5, 2.0, 2.5, 3.0, 4.0, 5.0]  # More granular
+  slippage_pips: [0.3, 0.5, 0.8, 1.0, 1.5]     # More granular
+
+universe:
+  pairs: [EUR_USD, GBP_USD, USD_JPY, AUD_USD, USD_CAD, USD_CHF, NZD_USD, EUR_JPY, GBP_JPY, XAU_USD]
+  timeframes: [1m, 5m, 15m, 30m, 1h, 4h, 1d, 1w]  # All timeframes
+  strategies:
+    - comprehensive_enhanced_strategy
+    - ultra_strict_v3_strategy
+    - news_enhanced_strategy
+    - enhanced_optimized_strategy
+
+search_space:
+  # Technical indicators - EXPANDED for more combinations
+  ema_fast: [3, 5, 8, 12, 15, 20, 25]
+  ema_slow: [21, 26, 34, 50, 55, 89, 100]
+  rsi_period: [9, 14, 21, 28]
+  rsi_bounds:
+    - [25, 75]
+    - [30, 70]
+    - [20, 80]
+    - [15, 85]
+  macd_fast: [5, 8, 12, 15]
+  macd_slow: [21, 26, 34, 50]
+  macd_signal: [5, 7, 9, 12]
+  atr_period: [10, 14, 21, 28]
+  
+  # Risk management - EXPANDED
+  stop_atr_mult: [0.8, 1.0, 1.2, 1.6, 2.0, 2.5, 3.0]
+  take_profit_rr: [1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0]
+  trailing_atr_mult: [null, 0.8, 1.0, 1.5, 2.0]
+  
+  # Session filtering - EXPANDED
+  session: [ALL, LONDON, NEW_YORK, TOKYO, OVERLAP_LDN_NY, OVERLAP_NY_ASIA]
+  news_blackout_minutes: [0, 15, 30, 45, 60, 90, 120]
+  
+  # Regime filtering - EXPANDED
+  regime_filter:
+    type: [NONE, TREND, RANGE, VOLATILE]
+    adx_threshold: [15, 20, 25, 30, 35]
+    bb_width_pct: [15, 20, 25, 30, 35, 40]
+  
+  # Strategy-specific parameters - EXPANDED
+  comprehensive_enhanced:
+    min_confidence: [60, 65, 70, 75, 80, 85]
+    news_weight: [0.1, 0.2, 0.3, 0.4, 0.5]
+    indicators_weight: [0.2, 0.3, 0.4, 0.5, 0.6]
+    technical_weight: [0.1, 0.2, 0.3, 0.4, 0.5]
+    min_volume_multiplier: [1.0, 1.2, 1.5, 2.0, 2.5]
+    min_atr_multiplier: [0.8, 1.0, 1.2, 1.5, 2.0]
+    max_daily_trades: [1, 2, 3, 5, 8, 10]
+    min_pips_threshold: [5, 8, 10, 12, 15, 20]
+  
+  ultra_strict_v3:
+    min_rr_ratio: [2.0, 2.5, 3.0, 3.5, 4.0]
+    min_confidence: [75, 80, 85, 90, 95]
+    min_volume_multiplier: [1.2, 1.5, 2.0, 2.5, 3.0]
+    min_atr_multiplier: [1.0, 1.2, 1.5, 2.0, 2.5]
+    max_daily_trades: [1, 2, 3, 4]
+    min_pips_threshold: [10, 12, 15, 18, 20, 25]
+    min_adx_trend: [15, 20, 25, 30, 35]
+    news_impact_threshold: [0.4, 0.6, 0.8, 1.0, 1.2]
+    sentiment_threshold: [0.5, 0.6, 0.7, 0.8, 0.9]
+  
+  news_enhanced:
+    min_rr_ratio: [1.5, 1.8, 2.0, 2.2, 2.5]
+    min_confidence: [60, 65, 70, 75, 80]
+    min_volume_multiplier: [1.1, 1.3, 1.5, 1.8, 2.0]
+    min_atr_multiplier: [0.9, 1.1, 1.2, 1.4, 1.6]
+    max_daily_trades: [2, 3, 4, 5, 6]
+    min_pips_threshold: [6, 8, 10, 12, 15]
+    news_impact_threshold: [0.3, 0.4, 0.5, 0.6, 0.7]
+    news_confidence_boost: [0.03, 0.05, 0.1, 0.15, 0.2]
+    news_confidence_penalty: [0.05, 0.1, 0.2, 0.3, 0.4]
+  
+  enhanced_optimized:
+    rsi_oversold: [15, 20, 25, 30, 35]
+    rsi_overbought: [65, 70, 75, 80, 85]
+    ema_short: [8, 12, 20, 26, 34]
+    ema_long: [34, 50, 100, 150, 200]
+    volume_threshold: [0.8, 1.0, 1.2, 1.5, 2.0]
+    atr_multiplier: [1.0, 1.5, 2.0, 2.5, 3.0]
+    take_profit_multiplier: [2.0, 3.0, 4.0, 5.0, 6.0]
+
+robustness:
+  mc_trials: 5000             # Increased for better statistics
+  param_perturbation_pct: 0.10
+  cost_stress_spread_pips: [2, 3, 4, 5, 6]
+  cost_stress_slippage_pips: [0.5, 1.0, 1.5, 2.0]
+
+selection:
+  min_trades_low_tf: 300      # Slightly reduced for more strategies
+  min_trades_high_tf: 100     # Slightly reduced for more strategies
+  min_oos_sharpe: 1.0         # Slightly reduced for more strategies
+  min_oos_sortino: 1.3        # Slightly reduced for more strategies
+  max_oos_dd: 0.15            # Slightly relaxed
+  max_sharpe_drop_under_stress: 0.35
+  min_profit_factor: 1.2      # Slightly reduced
+  min_win_rate: 0.40          # Slightly reduced
+
+data_validation:
+  min_completeness: 0.95
+  max_critical_gaps: 1
+  min_data_points: 500        # Reduced for faster validation
+  validation_layers: 3        # Reduced for speed
+
+engines:
+  professional_backtesting:
+    class: ProfessionalBacktestingSystem
+    module: professional_backtesting_system
+    timeframes: [1h]
+    parallel_workers: 8
+    memory_limit_gb: 8
+  
+  multi_timeframe_backtesting:
+    class: MultiTimeframeBacktestingSystem
+    module: multi_timeframe_backtesting_system
+    timeframes: [1m, 5m, 15m, 30m, 1h, 4h, 1d, 1w]
+    parallel_workers: 8
+    memory_limit_gb: 8
+
+strategies:
+  comprehensive_enhanced_strategy:
+    class: ComprehensiveEnhancedStrategy
+    module: strategies.comprehensive_enhanced_strategy
+    features: [news_integration, indicators_integration, technical_analysis]
+    parallel_workers: 4
+  
+  ultra_strict_v3_strategy:
+    class: UltraStrictV3Strategy
+    module: strategies.ultra_strict_v3_strategy
+    features: [ai_insights, ultra_strict_criteria, high_confidence]
+    parallel_workers: 4
+  
+  news_enhanced_strategy:
+    class: NewsEnhancedStrategy
+    module: strategies.news_enhanced_strategy
+    features: [news_integration, sentiment_analysis, economic_events]
+    parallel_workers: 4
+  
+  enhanced_optimized_strategy:
+    class: EnhancedOptimizedStrategy
+    module: strategies.enhanced_optimized_strategy
+    features: [market_regime_detection, dynamic_risk_management, session_filtering]
+    parallel_workers: 4
+
+validation:
+  advanced_validation:
+    class: AdvancedValidationFramework
+    module: advanced_validation_framework
+    features: [walk_forward_analysis, monte_carlo_validation, out_of_sample_testing]
+    parallel_workers: 8
+    gpu_acceleration: true
+  
+  risk_management:
+    class: RiskManagementFramework
+    module: risk_management_framework
+    features: [position_sizing, risk_limits, portfolio_tracking]
+    parallel_workers: 4
+  
+  data_gap_analysis:
+    class: ProfessionalDataGapAnalyzer
+    module: professional_data_gap_analyzer
+    features: [gap_detection, data_quality_assessment, completeness_analysis]
+    parallel_workers: 4
+
+# High-performance specific settings
+performance:
+  use_gpu: true
+  gpu_memory_fraction: 0.9
+  cpu_cores: 16
+  memory_gb: 56
+  batch_processing: true
+  vectorized_operations: true
+  cache_size_gb: 8
+  temp_dir: "/tmp/high_perf_backtesting"
+  
+# Parallel processing configuration
+parallel:
+  max_workers: 16
+  chunk_size: 100
+  prefetch_factor: 4
+  timeout_seconds: 3600
+  retry_attempts: 3
+  
+# Optimization settings
+optimization:
+  algorithm: "optuna"  # Use Optuna for intelligent search
+  n_trials: 10000      # Large number of trials
+  timeout_seconds: 86400  # 24 hours
+  pruner: "median"
+  sampler: "tpe"
+  
+# Memory management
+memory:
+  use_mmap: true
+  chunk_size_mb: 256
+  cache_cleanup_interval: 300
+  max_memory_usage: 0.9

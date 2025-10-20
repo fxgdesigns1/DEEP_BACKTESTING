@@ -1,0 +1,316 @@
+# DEEP COMPREHENSIVE BACKTESTING - October 13, 2025
+# Includes: Session-based, Quick Wins, Prop Firm Challenges
+# Post-update testing with optimized parameters
+
+meta:
+  run_name: deep_comprehensive_oct13_2025
+  results_dir: results/deep_comprehensive_oct13
+  seed: 1337
+  holdout_months: 6           # More recent data for validation
+  wfo_test_months: 2          # Shorter OOS for faster iteration
+  embargo_hours: 12           # Prevent leakage
+  use_bayesian: true
+  max_workers: 30             # Utilize AMD 5950X fully
+
+risk:
+  capital: 10000              # Standard prop firm starting capital
+  risk_per_trade: [0.005, 0.01, 0.015]  # 0.5%-1.5% for prop firms
+  max_drawdown: 0.10          # 10% max DD for prop firm challenges
+  max_daily_loss: 0.05        # 5% daily loss limit
+  max_daily_trades: [10, 20, 30, 50]  # Various activity levels
+
+costs:
+  spread_pips: [1.5, 2.0, 2.5]  # Realistic spreads
+  slippage_pips: [0.5, 1.0]
+  commission_per_lot: 0.0      # Many prop firms have no commission
+
+# Universe - Focus on liquid pairs and Gold
+universe:
+  pairs: [EUR_USD, GBP_USD, USD_JPY, AUD_USD, USD_CAD, NZD_USD, EUR_GBP, XAU_USD, GBP_JPY, EUR_JPY]
+  timeframes: [5m, 15m, 30m, 1h, 4h]  # Focus on intraday to swing
+  
+strategies:
+  - session_highs_lows        # NEW: Session extreme hunting
+  - quick_scalper             # NEW: Fast wins strategy
+  - prop_firm_challenge       # NEW: Prop firm optimized
+  - ultra_strict_v3_strategy  # Updated with new params
+  - momentum_strategy         # Updated with disabled pairs
+  - breakout_continuation     # NEW: Breakout trading
+
+# ===================================================================
+# SESSION-BASED STRATEGY - Hunt Session Highs/Lows
+# ===================================================================
+session_highs_lows:
+  description: "Target session highs and lows with smart reversals"
+  
+  # Session definitions
+  sessions:
+    tokyo:
+      start_hour: 0
+      end_hour: 9
+      pairs: [USD_JPY, AUD_USD, NZD_USD]  # Asia-focused
+    london:
+      start_hour: 8
+      end_hour: 17
+      pairs: [EUR_USD, GBP_USD, EUR_GBP]  # Europe-focused
+    new_york:
+      start_hour: 13
+      end_hour: 22
+      pairs: [EUR_USD, GBP_USD, USD_JPY, USD_CAD]  # US-focused
+    overlap:
+      start_hour: 13
+      end_hour: 17
+      pairs: [EUR_USD, GBP_USD, USD_JPY]  # Highest liquidity
+  
+  # Entry logic
+  entry:
+    lookback_periods: [20, 30, 50]  # Bars to identify high/low
+    distance_from_extreme: [0.0005, 0.001, 0.0015]  # % from session high/low
+    confirmation_required: [true, false]
+    reversal_signals: [RSI, MACD, STOCHASTIC]
+    
+  # Exit logic
+  exit:
+    target_session_opposite: true  # Target opposite extreme
+    tp_pct: [0.002, 0.003, 0.005]  # 20-50 pips
+    sl_pct: [0.001, 0.0015, 0.002]  # 10-20 pips
+    trailing_stop: [true, false]
+    
+  # Risk management
+  risk:
+    min_rr_ratio: [1.5, 2.0, 2.5]
+    max_trades_per_session: [2, 3, 5]
+    avoid_news_minutes: [30, 60]
+
+# ===================================================================
+# QUICK WINS SCALPER - Fast In, Fast Out
+# ===================================================================
+quick_scalper:
+  description: "High frequency scalping for quick profits"
+  
+  timeframes: [5m, 15m]  # Fast timeframes only
+  
+  # Entry signals
+  entry:
+    signal_types: [MOMENTUM_BURST, MEAN_REVERSION, MICRO_BREAKOUT]
+    
+    momentum_burst:
+      period: [5, 10, 15]
+      threshold: [0.0003, 0.0005, 0.0008]  # 3-8 pips movement
+      volume_confirmation: [1.2, 1.5, 2.0]
+      
+    mean_reversion:
+      bb_period: [20, 30]
+      bb_std: [2.0, 2.5]
+      rsi_oversold: [25, 30]
+      rsi_overbought: [70, 75]
+      
+    micro_breakout:
+      consolidation_bars: [10, 15, 20]
+      breakout_threshold: [0.0005, 0.001]
+  
+  # Exit logic - Quick profits
+  exit:
+    quick_tp_pips: [5, 8, 10, 12, 15]  # Very tight targets
+    quick_sl_pips: [3, 5, 8]  # Very tight stops
+    time_exit_minutes: [5, 10, 15, 30]  # Exit if not hit target
+    breakeven_trigger_pips: [3, 5]
+    
+  # High activity
+  risk:
+    win_rate_target: 0.60  # Need high win rate for scalping
+    max_trades_per_day: [30, 50, 100]
+    max_consecutive_losses: [3, 5]
+    position_size_pct: [0.005, 0.01]  # Small size, high frequency
+
+# ===================================================================
+# PROP FIRM CHALLENGE STRATEGY
+# ===================================================================
+prop_firm_challenge:
+  description: "Optimized for prop firm challenges (FTMO, MyForexFunds, etc.)"
+  
+  # Prop firm challenge requirements
+  challenge_params:
+    profit_target: 0.10  # 10% profit target (Phase 1)
+    max_daily_loss: 0.05  # 5% daily loss limit
+    max_total_loss: 0.10  # 10% total drawdown limit
+    min_trading_days: [5, 10]  # Minimum days to trade
+    consistency_required: true  # No single day > 50% of profits
+    
+  # Conservative entry
+  entry:
+    signal_strength_min: [0.60, 0.70, 0.80]  # Very high confidence
+    confluence_required: [2, 3]  # Multiple indicator agreement
+    
+    indicators:
+      trend: [EMA_CROSS, MACD, ADX]
+      momentum: [RSI, STOCHASTIC, CCI]
+      support_resistance: [PIVOT_POINTS, FIBONACCI, S/R_ZONES]
+      
+    filters:
+      atr_min_multiplier: [1.2, 1.5]  # Good volatility
+      volume_min_multiplier: [1.2, 1.5]  # Good liquidity
+      spread_max_pips: [2.0, 2.5]  # Low spread only
+      
+  # Risk management - CRITICAL for prop firms
+  risk:
+    risk_per_trade: [0.005, 0.01]  # 0.5-1% max
+    max_trades_per_day: [3, 5, 8]  # Conservative
+    daily_profit_target: 0.02  # 2% daily target
+    stop_trading_after_target: true
+    stop_trading_after_loss: 0.03  # Stop at 3% loss
+    
+  exit:
+    tp_rr_ratio: [2.0, 2.5, 3.0]  # High reward:risk
+    partial_take_profit: true
+    partial_tp_levels: [0.5, 0.75]  # Take 50% at 1.5R, 25% at 2.5R
+    trailing_stop_trigger: 1.5  # Trail after 1.5R
+    breakeven_trigger: 0.8  # Move to BE at 0.8R
+
+# ===================================================================
+# BREAKOUT CONTINUATION STRATEGY
+# ===================================================================
+breakout_continuation:
+  description: "Trade breakouts with continuation confirmation"
+  
+  entry:
+    breakout_type: [RANGE_BREAKOUT, TREND_CONTINUATION, VOLATILITY_EXPANSION]
+    
+    range_breakout:
+      consolidation_bars: [20, 30, 50]
+      atr_threshold: [0.5, 0.7]  # Low volatility consolidation
+      breakout_volume: [1.5, 2.0, 2.5]
+      
+    trend_continuation:
+      trend_strength_adx: [20, 25, 30]
+      pullback_fib_levels: [0.382, 0.5, 0.618]
+      resume_confirmation: [true, false]
+      
+  exit:
+    tp_atr_mult: [2.0, 3.0, 4.0]
+    sl_atr_mult: [1.0, 1.5, 2.0]
+    trailing_atr_mult: [1.5, 2.0]
+    
+  risk:
+    max_trades_per_day: [5, 10, 15]
+    min_rr_ratio: [2.0, 2.5, 3.0]
+
+# ===================================================================
+# UPDATED EXISTING STRATEGIES (with Oct 13 params)
+# ===================================================================
+ultra_strict_v3_strategy:
+  min_signal_strength: 0.40  # UPDATED from 0.35
+  disabled_pairs: [GBP_USD, USD_JPY]  # UPDATED
+  max_trades_per_day: [2, 3, 5]
+  min_rr_ratio: [2.5, 3.0, 3.5]
+
+momentum_strategy:
+  disabled_pairs: [NZD_USD]  # UPDATED
+  min_momentum: [0.002, 0.0025, 0.003]
+  sl_atr: [1.0, 1.5, 2.0]
+  tp_atr: [1.5, 2.0, 2.5]
+
+# ===================================================================
+# ROBUSTNESS & VALIDATION
+# ===================================================================
+robustness:
+  monte_carlo_trials: 500  # Comprehensive MC analysis
+  parameter_perturbation_pct: 0.10
+  cost_stress_spread_pips: [2.5, 3.0, 4.0]
+  cost_stress_slippage_pips: [1.0, 1.5]
+  
+  # Prop firm specific tests
+  prop_firm_tests:
+    max_dd_test: true
+    daily_loss_test: true
+    consistency_test: true
+    min_days_test: true
+
+# ===================================================================
+# SELECTION CRITERIA - Strict for prop firms
+# ===================================================================
+selection:
+  # Performance
+  min_oos_sharpe: 1.5  # Higher requirement
+  min_oos_sortino: 2.0
+  max_oos_dd: 0.08  # 8% max for prop firms
+  min_profit_factor: 1.5
+  min_win_rate: 0.50
+  
+  # Prop firm specific
+  prop_firm_criteria:
+    max_single_day_contribution: 0.30  # No day > 30% of profit
+    min_winning_days_pct: 0.60  # 60% winning days
+    max_daily_dd: 0.05  # 5% max daily DD
+    consistency_score_min: 0.70
+    
+  # Trade volume
+  min_trades_low_tf: 200  # Enough data
+  min_trades_high_tf: 50
+  
+  # Stress testing
+  max_sharpe_drop_under_stress: 0.25
+  min_mc_survival_rate: 0.80  # 80% of MC runs profitable
+
+# ===================================================================
+# DATA VALIDATION
+# ===================================================================
+data_validation:
+  min_completeness: 0.95
+  max_critical_gaps: 1
+  min_data_points: 2000
+  validation_layers: 5
+  
+  # Real data only (GOLDEN RULE)
+  enforce_real_data: true
+  fail_on_synthetic: true
+  master_dataset_required: true
+
+# ===================================================================
+# OPTIMIZATION SETTINGS
+# ===================================================================
+optimization:
+  method: bayesian  # Faster convergence
+  iterations: 200  # Deep search
+  parallel_workers: 30  # Max out 5950X
+  
+  early_stopping:
+    enabled: true
+    patience: 30
+    min_improvement: 0.01
+    
+# ===================================================================
+# REPORTING
+# ===================================================================
+reporting:
+  generate_html: true
+  generate_pdf: false
+  include_charts: true
+  include_heatmaps: true
+  
+  # Prop firm specific reports
+  prop_firm_report:
+    daily_pnl_curve: true
+    drawdown_analysis: true
+    consistency_metrics: true
+    challenge_simulation: true
+    
+  metrics:
+    - sharpe_ratio
+    - sortino_ratio
+    - calmar_ratio
+    - max_drawdown
+    - avg_drawdown
+    - win_rate
+    - profit_factor
+    - expectancy
+    - avg_win_loss_ratio
+    - consecutive_wins
+    - consecutive_losses
+    - best_day
+    - worst_day
+    - profit_consistency
+    - daily_profit_std
+
+
+

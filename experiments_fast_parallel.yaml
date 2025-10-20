@@ -1,0 +1,133 @@
+meta:
+  run_name: fast_parallel_search
+  results_dir: results
+  seed: 1337
+  holdout_months: 6           # Reduced for faster execution
+  wfo_test_months: 2          # Reduced for faster execution
+  embargo_hours: 12           # Reduced for faster execution
+  use_bayesian: false         # Use grid search for faster execution
+
+risk:
+  capital: 100000
+  risk_per_trade: [0.01, 0.02]  # Reduced parameter space
+  max_drawdown: 0.15
+
+costs:
+  spread_pips: [2, 3]         # Reduced parameter space
+  slippage_pips: [0.5, 1.0]
+
+universe:
+  pairs: [EUR_USD, GBP_USD, USD_JPY, AUD_USD, XAU_USD]  # Focus on major pairs
+  timeframes: [1h, 4h, 1d]    # Focus on main timeframes
+  strategies:
+    - enhanced_optimized_strategy
+    - comprehensive_enhanced_strategy
+
+search_space:
+  # Technical indicators - reduced parameter space
+  ema_fast: [8, 20]
+  ema_slow: [21, 50]
+  rsi_period: [14]
+  rsi_bounds:
+    - [30, 70]
+    - [20, 80]
+  macd_fast: [12]
+  macd_slow: [26]
+  macd_signal: [9]
+  atr_period: [14]
+  
+  # Risk management - reduced parameter space
+  stop_atr_mult: [1.5, 2.0]
+  take_profit_rr: [2.0, 3.0]
+  trailing_atr_mult: [null, 1.0]
+  
+  # Session filtering - reduced parameter space
+  session: [ALL, LONDON, NEW_YORK]
+  news_blackout_minutes: [0, 30]
+  
+  # Regime filtering - reduced parameter space
+  regime_filter:
+    type: [NONE, TREND]
+    adx_threshold: [20, 25]
+    bb_width_pct: [20, 30]
+  
+  # Strategy-specific parameters - reduced parameter space
+  comprehensive_enhanced:
+    min_confidence: [70, 80]
+    news_weight: [0.3]
+    indicators_weight: [0.4]
+    technical_weight: [0.3]
+    min_volume_multiplier: [1.5]
+    min_atr_multiplier: [1.2]
+    max_daily_trades: [3]
+    min_pips_threshold: [10]
+  
+  enhanced_optimized:
+    rsi_oversold: [25, 30]
+    rsi_overbought: [70, 75]
+    ema_short: [12, 20]
+    ema_long: [50, 100]
+    volume_threshold: [1.2]
+    atr_multiplier: [2.0]
+    take_profit_multiplier: [3.0, 4.0]
+
+robustness:
+  mc_trials: 500              # Reduced for faster execution
+  param_perturbation_pct: 0.1
+  cost_stress_spread_pips: [3]
+  cost_stress_slippage_pips: [1.0]
+
+selection:
+  min_trades_low_tf: 200      # Relaxed for faster results
+  min_trades_high_tf: 100     # Relaxed for faster results
+  min_oos_sharpe: 1.0         # Relaxed for faster results
+  min_oos_sortino: 1.2        # Relaxed for faster results
+  max_oos_dd: 0.15            # Relaxed for faster results
+  max_sharpe_drop_under_stress: 0.4
+  min_profit_factor: 1.2      # Relaxed for faster results
+  min_win_rate: 0.40          # Relaxed for faster results
+
+data_validation:
+  min_completeness: 0.85      # Relaxed for faster execution
+  max_critical_gaps: 3
+  min_data_points: 500        # Reduced for faster execution
+  validation_layers: 3        # Reduced for faster execution
+
+engines:
+  professional_backtesting:
+    class: ProfessionalBacktestingSystem
+    module: professional_backtesting_system
+    timeframes: [1h]
+  
+  multi_timeframe_backtesting:
+    class: MultiTimeframeBacktestingSystem
+    module: multi_timeframe_backtesting_system
+    timeframes: [1h, 4h, 1d]
+
+strategies:
+  comprehensive_enhanced_strategy:
+    class: ComprehensiveEnhancedStrategy
+    module: strategies.comprehensive_enhanced_strategy
+    features: [news_integration, indicators_integration, technical_analysis]
+  
+  enhanced_optimized_strategy:
+    class: EnhancedOptimizedStrategy
+    module: strategies.enhanced_optimized_strategy
+    features: [market_regime_detection, dynamic_risk_management, session_filtering]
+
+validation:
+  advanced_validation:
+    class: AdvancedValidationFramework
+    module: advanced_validation_framework
+    features: [walk_forward_analysis, monte_carlo_validation, out_of_sample_testing]
+  
+  risk_management:
+    class: RiskManagementFramework
+    module: risk_management_framework
+    features: [position_sizing, risk_limits, portfolio_tracking]
+  
+  data_gap_analysis:
+    class: ProfessionalDataGapAnalyzer
+    module: professional_data_gap_analyzer
+    features: [gap_detection, data_quality_assessment, completeness_analysis]
+

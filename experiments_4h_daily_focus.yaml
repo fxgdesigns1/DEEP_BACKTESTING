@@ -1,0 +1,60 @@
+meta:
+  run_name: 4h_daily_focus_v1
+  results_dir: results
+  seed: 1337
+  holdout_months: 9
+  wfo_test_months: 6
+  embargo_hours: 48
+  use_bayesian: true
+
+risk:
+  capital: 100000
+  risk_per_trade: [0.01, 0.015, 0.02]
+  max_drawdown: 0.15
+
+costs:
+  spread_pips: [2, 3]
+  slippage_pips: [0.5, 1.0]
+
+universe:
+  pairs: [EUR_USD, XAU_USD]
+  timeframes: [4h, 1d]
+  strategies: [enhanced_optimized_strategy, news_enhanced_strategy]
+
+search_space:
+  ema_fast: [8, 12, 20]
+  ema_slow: [50, 100, 200]
+  rsi_period: [14, 21]
+  rsi_bounds: [[30, 70]]
+  macd_fast: [12]
+  macd_slow: [26]
+  macd_signal: [9]
+  atr_period: [14, 21]
+  stop_atr_mult: [1.6, 2.0, 2.5]
+  take_profit_rr: [1.5, 2.0, 2.5]
+  trailing_atr_mult: [null, 1.0, 1.5]
+  session: [ALL, LONDON, OVERLAP_LDN_NY]
+  news_blackout_minutes: [0, 60, 120]
+  regime_filter:
+    type: [TREND]
+    adx_threshold: [20, 25, 30]
+
+robustness:
+  mc_trials: 500
+  param_perturbation_pct: 0.15
+  cost_stress_spread_pips: [3, 5]
+  cost_stress_slippage_pips: [1.0]
+
+selection:
+  min_trades_low_tf: 400
+  min_trades_high_tf: 150
+  min_oos_sharpe: 1.2
+  min_oos_sortino: 1.6
+  max_oos_dd: 0.12
+  max_sharpe_drop_under_stress: 0.3
+
+data_validation:
+  min_completeness: 0.90
+  max_critical_gaps: 2
+  min_data_points: 1000
+  validation_layers: 5

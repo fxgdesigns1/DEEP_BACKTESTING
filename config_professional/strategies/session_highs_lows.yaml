@@ -1,0 +1,20 @@
+# strategies/session_highs_lows.yaml
+name: Session Highs/Lows
+type: Session-based reversals
+parameters:
+  london_window_utc:
+    start_range: ["07:00","08:00"]
+    end_range: ["09:30","10:30"]
+    step_minutes: 15
+  ny_window_utc:
+    start_range: ["12:30","13:30"]
+    end_range: ["14:30","15:30"]
+    step_minutes: 15
+  reversal_threshold_pct_adr:
+    range: [35, 70]
+    step: 5
+  confirmation_candles:
+    choices: [1, 2, 3]
+  time_in_trade_cap_minutes:
+    range: [30, 240]
+    step: 15

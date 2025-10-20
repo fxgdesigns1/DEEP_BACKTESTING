@@ -1,0 +1,322 @@
+# TOPSTEP 100K CHALLENGE - STRATEGY CONFIGURATION
+# Adapted from proven EMA 3/12 crossover strategies
+# Challenge Rules Compliance
+
+# ============================================================================
+# TOPSTEP 100K ACCOUNT RULES
+# ============================================================================
+topstep_rules:
+  account_size: 100000
+  profit_target: 6000              # Must reach $6,000 to pass
+  daily_loss_limit: 2000           # Max $2,000 loss per day
+  trailing_max_drawdown: 3000      # Max $3,000 trailing drawdown
+  max_position_size: 10            # Max 10 contracts
+  consistency_rule: 3000           # No single day > $3,000 profit (50% of target)
+  position_close_time: "16:10 ET"  # Must close all positions before 4:10 PM ET
+  no_overnight: true               # Cannot hold overnight or weekends
+  monthly_fee: 325
+
+# ============================================================================
+# RISK MANAGEMENT (TOPSTEP-COMPLIANT)
+# ============================================================================
+risk_management:
+  # Conservative approach to stay within limits
+  max_daily_loss: 1500             # Buffer below $2,000 limit
+  max_trailing_dd: 2500            # Buffer below $3,000 limit
+  max_daily_profit: 2500           # Stay below consistency rule
+  
+  # Position sizing
+  risk_per_trade_dollars: 200      # $200 risk per trade (0.2% of account)
+  max_contracts_per_trade: 2       # Start conservative with 2 contracts
+  max_concurrent_trades: 3         # Max 3 positions at once (total 6 contracts)
+  max_daily_trades: 15             # Limit to 15 trades/day
+  
+  # Stop losses
+  hard_stop_loss: true
+  emergency_close_at_limit: true   # Auto-close all if approaching limits
+
+# ============================================================================
+# FUTURES INSTRUMENTS (TOPSTEP-APPROVED)
+# ============================================================================
+# Apply EMA 3/12 strategy to these liquid futures markets
+instruments:
+  - symbol: ES              # E-mini S&P 500
+    name: "S&P 500 Futures"
+    tick_value: 12.50       # $12.50 per tick
+    margin: 500             # Approx margin per contract
+    enabled: true
+    
+  - symbol: NQ              # E-mini Nasdaq 100
+    name: "Nasdaq 100 Futures"
+    tick_value: 5.00        # $5.00 per tick
+    margin: 500
+    enabled: true
+    
+  - symbol: YM              # E-mini Dow Jones
+    name: "Dow Jones Futures"
+    tick_value: 5.00
+    margin: 500
+    enabled: true
+    
+  - symbol: RTY             # E-mini Russell 2000
+    name: "Russell 2000 Futures"
+    tick_value: 5.00
+    margin: 500
+    enabled: true
+    
+  - symbol: GC              # Gold Futures
+    name: "Gold Futures"
+    tick_value: 10.00
+    margin: 1000
+    enabled: true
+    
+  - symbol: CL              # Crude Oil Futures
+    name: "Crude Oil Futures"
+    tick_value: 10.00
+    margin: 1000
+    enabled: false          # More volatile, start disabled
+
+# ============================================================================
+# STRATEGY: EMA 3/12 CROSSOVER (PROVEN FORMULA)
+# ============================================================================
+strategy:
+  name: "EMA_3_12_Topstep"
+  type: "ema_crossover"
+  
+  # Timeframes (5-minute for scalping like forex strategies)
+  timeframe: "5m"
+  higher_timeframe: "15m"   # For trend filter
+  
+  # EMA Parameters (proven from forex backtests)
+  ema_fast: 3
+  ema_slow: 12
+  
+  # Entry conditions
+  entry_rules:
+    - ema_crossover: true               # 3 EMA crosses 12 EMA
+    - rsi_filter: true                  # RSI between 20-80
+    - htf_trend_alignment: true         # Higher timeframe confirms direction
+    - volume_confirmation: true         # Above average volume
+    - avoid_major_news: true            # Avoid high-impact news (5 min buffer)
+  
+  # Exit conditions
+  exit_rules:
+    - take_profit_ratio: 2.0            # 1:2 Risk:Reward
+    - stop_loss_atr_multiplier: 1.5     # 1.5x ATR stop loss
+    - trailing_stop: true               # Trail stop once in 1:1 profit
+    - time_based_close: "16:00 ET"      # Close all by 4:00 PM (10 min buffer)
+    - reverse_signal_close: true        # Close on opposite signal
+  
+  # Filters
+  filters:
+    rsi_period: 14
+    rsi_oversold: 20
+    rsi_overbought: 80
+    atr_period: 14
+    min_atr: 0.5                        # Minimum volatility to trade
+
+# ============================================================================
+# TRADING HOURS (TOPSTEP-COMPLIANT)
+# ============================================================================
+trading_hours:
+  # Focus on liquid sessions
+  enabled_sessions:
+    - name: "London/NY Overlap"
+      start: "08:00 ET"
+      end: "12:00 ET"
+      priority: "high"
+      
+    - name: "NY Morning"
+      start: "09:30 ET"
+      end: "11:30 ET"
+      priority: "high"
+      
+    - name: "NY Afternoon"
+      start: "13:00 ET"
+      end: "15:30 ET"
+      priority: "medium"
+  
+  # Hard stop trading
+  hard_stop_time: "16:00 ET"            # Stop entering new trades
+  close_all_time: "16:05 ET"            # Force close all positions
+  emergency_close_time: "16:08 ET"      # Emergency close if still open
+
+# ============================================================================
+# DAILY LIMITS & CIRCUIT BREAKERS
+# ============================================================================
+daily_limits:
+  # Profit targets
+  daily_profit_target: 400              # Aim for $400/day (15 days to pass)
+  weekly_profit_target: 2000            # $2,000/week
+  
+  # Loss limits (CRITICAL)
+  max_loss_per_trade: 200               # $200 max loss per trade
+  max_daily_loss: 1500                  # Stop trading at $1,500 loss
+  emergency_stop_loss: 1800             # Force close all at $1,800 loss
+  
+  # Circuit breakers
+  consecutive_losses_limit: 4           # Stop after 4 losses in a row
+  cool_down_period_minutes: 30          # Wait 30 min after hitting limit
+  
+  # Profit limits (Consistency Rule)
+  max_daily_profit: 2500                # Stop at $2,500 to avoid consistency violation
+  warn_at_profit: 2000                  # Warning when approaching limit
+
+# ============================================================================
+# POSITION SIZING CALCULATOR
+# ============================================================================
+position_sizing:
+  method: "fixed_dollar_risk"           # Risk fixed $ amount per trade
+  risk_amount: 200                      # $200 per trade
+  
+  # Dynamic sizing based on ATR
+  use_atr_sizing: true
+  atr_multiplier: 1.5                   # Stop loss = 1.5 x ATR
+  
+  # Contract limits
+  min_contracts: 1
+  max_contracts_per_trade: 2            # Conservative start
+  max_total_contracts: 6                # Max exposure across all trades
+  
+  # Scaling (once comfortable)
+  scale_up_after_wins: 5                # Increase size after 5 wins
+  scale_down_after_losses: 3            # Decrease size after 3 losses
+
+# ============================================================================
+# PERFORMANCE TRACKING
+# ============================================================================
+tracking:
+  # Daily metrics
+  track_metrics:
+    - daily_pnl
+    - daily_trades
+    - win_rate
+    - largest_win
+    - largest_loss
+    - consecutive_wins
+    - consecutive_losses
+    - drawdown_current
+    - profit_target_progress
+  
+  # Alerts
+  alerts:
+    - type: "approaching_daily_loss_limit"
+      threshold: 1200                   # Alert at $1,200 loss
+      action: "reduce_size"
+      
+    - type: "approaching_consistency_limit"
+      threshold: 2000                   # Alert at $2,000 profit
+      action: "consider_stopping"
+      
+    - type: "consecutive_losses"
+      threshold: 3
+      action: "pause_trading"
+      
+    - type: "profit_target_achieved"
+      threshold: 6000
+      action: "stop_all_trading"
+
+# ============================================================================
+# INTEGRATION SETTINGS
+# ============================================================================
+integration:
+  # TopStep supported platforms
+  platform: "NinjaTrader"               # or "TSTrader" or "TradingView"
+  
+  # API settings
+  use_api: true
+  real_time_data: true
+  
+  # Automation
+  automated_trading: true               # TopStep allows EAs
+  manual_override: true                 # Allow manual intervention
+  
+  # Logging
+  log_all_trades: true
+  export_daily_reports: true
+  save_to_cloud: true
+
+# ============================================================================
+# CHALLENGE PROGRESSION PLAN
+# ============================================================================
+challenge_plan:
+  phase_1:
+    name: "Conservative Start"
+    days: "1-5"
+    daily_target: 300
+    max_contracts: 2
+    max_daily_trades: 10
+    focus: "Build confidence, avoid losses"
+    
+  phase_2:
+    name: "Steady Growth"
+    days: "6-10"
+    daily_target: 400
+    max_contracts: 3
+    max_daily_trades: 12
+    focus: "Consistent profits, risk management"
+    
+  phase_3:
+    name: "Push to Target"
+    days: "11-15"
+    daily_target: 500
+    max_contracts: 4
+    max_daily_trades: 15
+    focus: "Reach $6,000 target without violating consistency"
+    
+  fallback:
+    name: "Recovery Mode"
+    trigger: "After significant loss day"
+    daily_target: 200
+    max_contracts: 1
+    max_daily_trades: 8
+    focus: "Rebuild confidence with minimal risk"
+
+# ============================================================================
+# NOTES & REMINDERS
+# ============================================================================
+notes: |
+  CRITICAL TOPSTEP RULES TO REMEMBER:
+  
+  1. DAILY LOSS LIMIT: $2,000 - YOU CANNOT EXCEED THIS!
+     - Strategy stops at $1,500 for safety buffer
+     - Emergency close at $1,800
+  
+  2. CONSISTENCY RULE: No single day > $3,000 profit
+     - Strategy caps at $2,500 for safety
+     - If approaching, STOP TRADING for the day
+  
+  3. TRAILING MAX DRAWDOWN: $3,000 from highest balance
+     - Once you're up $1,000, new max loss is $2,000 from peak
+     - Strategy caps at $2,500 drawdown for safety
+  
+  4. CLOSE ALL POSITIONS BY 4:10 PM ET
+     - Strategy force-closes at 4:05 PM
+     - NO OVERNIGHT/WEEKEND POSITIONS ALLOWED!
+  
+  5. PROFIT TARGET: $6,000 to pass challenge
+     - Aim for $400/day = 15 days
+     - Can do faster but watch consistency rule!
+  
+  STRATEGY ADVANTAGES:
+  - EMA 3/12 proven with 80%+ win rate on forex
+  - Short holding times (avg 18 minutes) = no overnight risk
+  - High frequency (50-60 trades/week) = multiple opportunities
+  - Low drawdown historically (0.4-3.5%) = well under TopStep limits
+  
+  RECOMMENDED APPROACH:
+  1. Start with ES (S&P 500) only - most liquid
+  2. Trade London/NY overlap (8am-12pm ET) - best liquidity
+  3. Use 2 contracts max for first week
+  4. Scale up slowly as confidence builds
+  5. ALWAYS respect the daily loss limit!
+  
+  ESTIMATED TIMELINE:
+  - Conservative: 15-20 trading days
+  - Moderate: 12-15 trading days
+  - Aggressive (not recommended): 8-10 days (risks consistency rule)
+
+
+
+
+

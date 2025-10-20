@@ -1,0 +1,20 @@
+# strategies/ultra_strict.yaml
+name: Ultra Strict
+type: Conservative high-quality entries
+parameters:
+  entry_filter_strength:
+    range: [0.60, 0.95]
+    step: 0.02
+    jitter: 0.01
+  higher_tf_confirm:
+    choices: [true, false]
+  atr_sl_multiple:
+    range: [1.0, 2.5]
+    step: 0.1
+    jitter: 0.05
+  rr_target:
+    range: [1.2, 2.2]
+    step: 0.1
+    jitter: 0.05
+  max_concurrent_trades:
+    choices: [1, 2]

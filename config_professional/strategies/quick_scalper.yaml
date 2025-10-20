@@ -1,0 +1,19 @@
+# strategies/quick_scalper.yaml
+name: Quick Scalper
+type: High-frequency scalping
+parameters:
+  noise_filter_ticks:
+    range: [5, 20]
+    step: 1
+  pivot_offset_pips:
+    range: [0.5, 2.5]
+    step: 0.1
+  hard_stop_pips:
+    range: [2.0, 6.0]
+    step: 0.5
+  take_profit_pips:
+    range: [2.0, 8.0]
+    step: 0.5
+  max_spread_filter_pips:
+    range: [1.0, 2.5]
+    step: 0.1

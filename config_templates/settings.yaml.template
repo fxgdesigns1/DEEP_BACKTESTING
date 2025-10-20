@@ -1,0 +1,95 @@
+# Quant Strategy AI Configuration
+# Core trading parameters
+
+# Trading Parameters
+bias_mode: "system-detect"  # system-detect, bullish, bearish
+rr_min:
+  swing: 3.0
+  scalp: 1.8
+
+# Core Major Pairs (always analyzed)
+core_major_pairs:
+  - EUR_USD
+  - GBP_USD
+  - USD_JPY
+  - AUD_USD
+  - USD_CAD
+  - USD_CHF
+  - NZD_USD
+
+# Additional Watchlist
+watchlist:
+  - XAU_USD
+  - NDX_USD
+  - BTC_USD
+  - ETH_USD
+
+# Timeframes
+timeframes:
+  swing: ["1D", "4H", "1H", "15m"]
+  scalp: ["15m", "5m", "1m"]
+
+# Session Filters
+session_filters_enabled: true
+killzones:
+  London: "07:00-10:00"
+  NY: "13:30-16:00"
+
+# Data Sources
+data_sources:
+  primary: "alphavantage"  # alphavantage, oanda, marketaux, newsdata
+  backup: "oanda"
+  api_keys:
+    # Alpha Vantage API (Real-time Market Data)
+    alphavantage:
+      api_key: "YOUR_ALPHAVANTAGE_API_KEY_HERE"
+      base_url: "https://www.alphavantage.co/query"
+      rate_limit_per_minute: 5  # Free tier limit
+      rate_limit_per_day: 500   # Free tier limit
+    
+    # OANDA API (FX/CFD Trading)
+    oanda:
+      api_key: "YOUR_OANDA_API_KEY_HERE"
+      account_id: "YOUR_OANDA_ACCOUNT_ID_HERE"
+      base_url: "https://api-fxpractice.oanda.com"  # Practice account
+      # For live: "https://api-fxtrade.oanda.com"
+      rate_limit_per_second: 100
+    
+    # Marketaux API (News Data)
+    marketaux:
+      api_key: "YOUR_MARKETAUX_API_KEY_HERE"
+      base_url: "https://api.marketaux.com/v1"
+      rate_limit_per_minute: 100
+    
+    # NewsData.io API (Additional News)
+    newsdata:
+      api_key: "YOUR_NEWSDATA_API_KEY_HERE"
+      base_url: "https://newsdata.io/api/1"
+      rate_limit_per_minute: 10  # Free tier
+
+# Risk Management
+risk_management:
+  max_risk_per_trade: 0.01  # 1% per trade
+  max_daily_loss: 0.03      # 3% daily drawdown limit
+  max_exposure: 0.10        # 10% total portfolio exposure
+  max_positions: 5          # Maximum concurrent positions
+  position_sizing: "fixed_percentage"  # fixed_percentage, kelly, volatility_adjusted
+
+# Trading Settings
+trading:
+  mode: "paper"  # paper, live
+  auto_trade: false
+  require_confirmation: true
+  
+# Strategy Settings
+strategies:
+  enabled:
+    - "ma_ribbon"
+    - "momentum_v2"
+    - "ultra_selective"
+  
+  filters:
+    min_win_rate: 0.65     # 65% minimum
+    min_profit_factor: 1.5
+    max_drawdown: 0.15     # 15% max drawdown
+
