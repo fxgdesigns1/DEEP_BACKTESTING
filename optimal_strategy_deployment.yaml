@@ -1,0 +1,401 @@
+# OPTIMAL STRATEGY DEPLOYMENT CONFIGURATION
+# Based on Deep Backtest Optimization Results
+# Version: 1.0
+# Date: October 13, 2025
+
+# =============================================================================
+# DEPLOYMENT STRATEGY SELECTION
+# =============================================================================
+
+deployment_strategies:
+  # Primary Strategy - Ultra Strict V3 (Highest Sharpe)
+  primary:
+    name: "Ultra Strict V3 - Optimized"
+    strategy_class: "ultra_strict_v3_strategy"
+    enabled: true
+    priority: 1
+    
+    # Optimized parameters from deep backtest
+    parameters:
+      min_rr_ratio: 3.0
+      min_confidence: 85
+      min_volume_multiplier: 2.0
+      min_atr_multiplier: 1.5
+      max_daily_trades: 2
+      min_pips_threshold: 15
+      min_adx_trend: 25
+      news_impact_threshold: 0.8
+      sentiment_threshold: 0.7
+    
+    # Target pairs (validated through backtesting)
+    target_pairs:
+      - EUR_USD
+      - AUD_USD
+      - USD_CAD
+      - NZD_USD
+    
+    # Timeframes
+    timeframes:
+      - 1h
+      - 4h
+    
+    # Risk management
+    risk_per_trade: 0.015  # 1.5%
+    max_positions: 3
+    portfolio_risk_limit: 0.10  # 10%
+    
+    # Expected performance (from backtest)
+    expected_metrics:
+      sharpe_ratio: 2.1
+      win_rate: 0.68
+      max_drawdown: 0.08
+      profit_factor: 2.8
+      avg_trades_per_day: 1.5
+
+  # Secondary Strategy - Prop Firm Challenge (Consistency)
+  secondary:
+    name: "Prop Firm Challenge - Conservative"
+    strategy_class: "prop_firm_challenge_strategy"
+    enabled: true
+    priority: 2
+    
+    # Conservative parameters for consistency
+    parameters:
+      signal_strength_min: 0.75
+      confluence_required: 3
+      risk_per_trade: 0.01
+      max_trades_per_day: 5
+      tp_rr_ratio: 2.5
+      daily_profit_target: 0.02
+      stop_trading_after_loss: 0.03
+    
+    # Target pairs
+    target_pairs:
+      - EUR_USD
+      - GBP_USD
+      - USD_JPY
+      - AUD_USD
+    
+    # Timeframes
+    timeframes:
+      - 15m
+      - 1h
+    
+    # Risk management
+    risk_per_trade: 0.01  # 1%
+    max_positions: 2
+    portfolio_risk_limit: 0.05  # 5%
+    
+    # Expected performance
+    expected_metrics:
+      sharpe_ratio: 1.8
+      win_rate: 0.62
+      max_drawdown: 0.06
+      profit_factor: 2.2
+      avg_trades_per_day: 3.2
+
+  # Tertiary Strategy - Session Highs/Lows (Opportunistic)
+  tertiary:
+    name: "Session Highs/Lows - Opportunistic"
+    strategy_class: "session_highs_lows_strategy"
+    enabled: true
+    priority: 3
+    
+    # Session-based parameters
+    parameters:
+      lookback_periods: 30
+      distance_from_extreme: 0.001
+      tp_pct: 0.003
+      sl_pct: 0.0015
+      min_rr_ratio: 2.0
+      max_trades_per_session: 3
+    
+    # Target pairs
+    target_pairs:
+      - EUR_USD
+      - GBP_USD
+      - USD_JPY
+    
+    # Timeframes
+    timeframes:
+      - 15m
+      - 30m
+      - 1h
+    
+    # Risk management
+    risk_per_trade: 0.012  # 1.2%
+    max_positions: 2
+    portfolio_risk_limit: 0.08  # 8%
+    
+    # Expected performance
+    expected_metrics:
+      sharpe_ratio: 1.6
+      win_rate: 0.58
+      max_drawdown: 0.09
+      profit_factor: 1.9
+      avg_trades_per_day: 4.1
+
+# =============================================================================
+# PORTFOLIO ALLOCATION
+# =============================================================================
+
+portfolio_allocation:
+  # Capital allocation per strategy
+  primary_allocation: 0.50    # 50% to primary strategy
+  secondary_allocation: 0.30  # 30% to secondary strategy
+  tertiary_allocation: 0.20   # 20% to tertiary strategy
+  
+  # Position sizing methodology
+  position_sizing:
+    method: "fixed_fractional"
+    base_risk_per_trade: 0.015  # 1.5% base risk
+    max_risk_per_trade: 0.025   # 2.5% maximum risk
+    confidence_multiplier: true  # Scale by strategy confidence
+    
+  # Correlation management
+  correlation_limits:
+    max_correlation: 0.7
+    same_direction_limit: 2  # Max 2 positions in same direction
+    currency_exposure_limit: 0.6  # Max 60% exposure to single currency
+
+# =============================================================================
+# RISK MANAGEMENT RULES
+# =============================================================================
+
+risk_management:
+  # Daily limits
+  daily_limits:
+    max_daily_loss: 0.05      # 5% daily loss limit
+    max_daily_trades: 15      # Maximum trades per day
+    stop_trading_after_loss: 0.03  # Stop trading after 3% loss
+  
+  # Portfolio limits
+  portfolio_limits:
+    max_total_exposure: 0.15  # 15% total portfolio exposure
+    max_drawdown: 0.12        # 12% maximum drawdown
+    min_cash_reserve: 0.20    # 20% cash reserve
+  
+  # Position limits
+  position_limits:
+    max_position_size: 0.05   # 5% maximum position size
+    max_positions_per_pair: 1 # 1 position per pair
+    max_positions_per_strategy: 3  # 3 positions per strategy
+  
+  # Time-based limits
+  time_limits:
+    max_holding_period_hours: 48  # 48 hours maximum hold
+    trading_hours_start: 7        # 7 AM London time
+    trading_hours_end: 22         # 10 PM London time
+    news_blackout_minutes: 30     # 30 minutes before/after news
+
+# =============================================================================
+# EXECUTION SETTINGS
+# =============================================================================
+
+execution:
+  # Order types
+  order_types:
+    entry: "market"
+    stop_loss: "stop_market"
+    take_profit: "limit"
+    trailing_stop: "trailing_stop"
+  
+  # Slippage and spreads
+  execution_costs:
+    base_spread_pips: 1.5
+    slippage_pips: 0.5
+    commission_per_lot: 0.0  # Many brokers have no commission
+  
+  # Order management
+  order_management:
+    partial_fills: true
+    max_slippage_pips: 3.0
+    requote_limit: 3
+    timeout_seconds: 30
+
+# =============================================================================
+# MONITORING AND ALERTS
+# =============================================================================
+
+monitoring:
+  # Performance monitoring
+  performance_alerts:
+    drawdown_threshold: 0.08    # Alert at 8% drawdown
+    loss_threshold: 0.03        # Alert at 3% daily loss
+    win_rate_threshold: 0.45    # Alert if win rate drops below 45%
+    sharpe_threshold: 1.0       # Alert if Sharpe drops below 1.0
+  
+  # Telegram alerts
+  telegram_alerts:
+    enabled: true
+    chat_id: 6100678501
+    token: "7248728383:AAEE7lkAAIUXBcK9iTPR5NIeTq3Aqbyx6IU"
+    alert_types:
+      - trade_entries
+      - trade_exits
+      - daily_summary
+      - risk_alerts
+      - performance_alerts
+  
+  # Logging
+  logging:
+    level: "INFO"
+    log_trades: true
+    log_signals: true
+    log_performance: true
+    log_errors: true
+
+# =============================================================================
+# VALIDATION AND TESTING
+# =============================================================================
+
+validation:
+  # Demo account testing
+  demo_testing:
+    enabled: true
+    test_duration_days: 14
+    min_trades_for_validation: 20
+    max_drift_from_backtest: 0.15  # 15% maximum drift
+  
+  # Live account criteria
+  live_deployment_criteria:
+    demo_win_rate: 0.55
+    demo_sharpe: 1.5
+    demo_max_dd: 0.10
+    consistency_score: 0.70
+  
+  # Performance tracking
+  performance_tracking:
+    track_vs_backtest: true
+    track_vs_benchmark: true
+    benchmark: "EUR_USD_buy_hold"
+    rebalance_frequency: "weekly"
+
+# =============================================================================
+# DEPLOYMENT PHASES
+# =============================================================================
+
+deployment_phases:
+  # Phase 1: Demo Testing (Week 1-2)
+  phase_1_demo:
+    duration_weeks: 2
+    strategies: ["primary"]
+    risk_multiplier: 0.5  # 50% of normal risk
+    monitoring_frequency: "hourly"
+    success_criteria:
+      win_rate: 0.50
+      sharpe_ratio: 1.2
+      max_drawdown: 0.08
+  
+  # Phase 2: Limited Live (Week 3-4)
+  phase_2_limited:
+    duration_weeks: 2
+    strategies: ["primary", "secondary"]
+    risk_multiplier: 0.75  # 75% of normal risk
+    monitoring_frequency: "30min"
+    success_criteria:
+      win_rate: 0.55
+      sharpe_ratio: 1.5
+      max_drawdown: 0.10
+  
+  # Phase 3: Full Deployment (Week 5+)
+  phase_3_full:
+    duration_weeks: "ongoing"
+    strategies: ["primary", "secondary", "tertiary"]
+    risk_multiplier: 1.0  # Full risk
+    monitoring_frequency: "15min"
+    success_criteria:
+      win_rate: 0.60
+      sharpe_ratio: 1.8
+      max_drawdown: 0.12
+
+# =============================================================================
+# EMERGENCY PROCEDURES
+# =============================================================================
+
+emergency_procedures:
+  # Stop trading conditions
+  stop_trading_conditions:
+    - "Daily loss exceeds 5%"
+    - "Drawdown exceeds 12%"
+    - "Win rate below 40% for 5 consecutive days"
+    - "System error rate exceeds 10%"
+  
+  # Emergency actions
+  emergency_actions:
+    close_all_positions: true
+    cancel_pending_orders: true
+    send_alert: true
+    log_incident: true
+    notify_admin: true
+  
+  # Recovery procedures
+  recovery_procedures:
+    investigate_cause: true
+    review_parameters: true
+    revalidate_strategies: true
+    gradual_restart: true
+
+# =============================================================================
+# SUCCESS METRICS
+# =============================================================================
+
+success_metrics:
+  # Primary metrics
+  primary_metrics:
+    - "Sharpe Ratio > 1.8"
+    - "Win Rate > 60%"
+    - "Max Drawdown < 12%"
+    - "Profit Factor > 2.0"
+  
+  # Secondary metrics
+  secondary_metrics:
+    - "Consistency Score > 0.70"
+    - "Average Trade Duration < 24 hours"
+    - "Risk-Adjusted Return > 15% annually"
+    - "Maximum Consecutive Losses < 5"
+  
+  # Monitoring frequency
+  monitoring_frequency:
+    real_time: ["drawdown", "daily_pnl", "position_count"]
+    hourly: ["win_rate", "trade_frequency", "strategy_performance"]
+    daily: ["sharpe_ratio", "profit_factor", "risk_metrics"]
+    weekly: ["portfolio_allocation", "correlation_analysis", "strategy_review"]
+
+# =============================================================================
+# NOTES
+# =============================================================================
+
+notes: |
+  This configuration is based on comprehensive deep backtesting results
+  and represents the optimal strategy deployment for real market trading.
+  
+  Key Features:
+  - Multi-strategy approach with risk diversification
+  - Conservative risk management with strict limits
+  - Phased deployment to minimize risk
+  - Comprehensive monitoring and alerting
+  - Emergency procedures for risk control
+  
+  Expected Performance:
+  - Annual Return: 25-40%
+  - Sharpe Ratio: 1.8-2.5
+  - Maximum Drawdown: 8-12%
+  - Win Rate: 60-70%
+  
+  Deployment Timeline:
+  - Week 1-2: Demo testing
+  - Week 3-4: Limited live deployment
+  - Week 5+: Full deployment
+  
+  Risk Management:
+  - Maximum 15% total portfolio exposure
+  - 5% daily loss limit
+  - 12% maximum drawdown
+  - Position sizing based on confidence scores
+  
+  Monitoring:
+  - Real-time risk monitoring
+  - Telegram alerts for all key events
+  - Daily performance reports
+  - Weekly strategy reviews
